@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>ShellFolio</title>
+    <link rel="stylesheet" href="index.css" />
+  </head>
+  <body>
+    <div id="terminal_window">
+      <div class="title_bar">
+        <div class="title_left">
+          <img src="cmd.svg" class="icon" />
+          <span class="title_text">shell</span>
+        </div>
+
+        <div class="title_right">
+          <button class="btn min">─</button>
+          <button class="btn max">▢</button>
+          <button class="btn close">✕</button>
+        </div>
+      </div>
+
+      <div id="terminal">
+        <div id="output"></div>
+
+        <div class="input_line">
+          <span class="prompt">aaditya@portfolio:~$</span>
+          <div class="input_wrapper">
+            <span class="ghost_text"></span>
+            <input type="text" id="command_input" />
+            <span class="cursor"></span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="index.js"></script>
+  </body>
+</html>

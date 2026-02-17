@@ -1,0 +1,185 @@
+body {
+  background: #1b1b1b;
+  margin: 0;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: Consolas, "Fira Code", monospace;
+}
+
+#terminal_window {
+  width: 900px;
+  height: 520px;
+  border: 2px solid #3a3a3a;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #0c0c0c;
+  box-shadow: 0 10px 35px rgba(0, 0, 0, 0.8);
+}
+
+.title_bar {
+  height: 32px;
+  background: #1f1f1f;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-left: 6px;
+  user-select: none;
+}
+
+.icon {
+  width: 16px;
+  height: 16px;
+}
+
+.title_text {
+  color: #d6d6d6;
+  font-size: 13px;
+}
+
+.title_left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding-left: 5px;
+}
+
+.title_right {
+  display: flex;
+  height: 100%;
+}
+
+.btn {
+  width: 46px;
+  height: 100%;
+  padding: 0;
+  background: transparent;
+  border: none;
+  color: #d6d6d6;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.btn:hover {
+  background: #333;
+}
+
+.btn.close:hover {
+  background: #c42b1c;
+  color: white;
+}
+
+#terminal {
+  font-size: 16px;
+  line-height: 1.4;
+  padding: 16px;
+  height: calc(100% - 32px);
+  box-sizing: border-box;
+  overflow-y: auto;
+}
+
+#terminal::-webkit-scrollbar {
+  width: 8px;
+}
+
+#terminal::-webkit-scrollbar-track {
+  background: #111;
+}
+
+#terminal::-webkit-scrollbar-thumb {
+  background: #333;
+  border-radius: 4px;
+}
+
+#terminal::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
+.input_line {
+  display: flex;
+  align-items: baseline;
+}
+
+.prompt {
+  margin-right: 8px;
+  color: white;
+}
+
+input {
+  background: none;
+  border: none;
+  color: inherit;
+  font-family: inherit;
+  font-size: inherit;
+  line-height: inherit;
+  outline: none;
+  width: 100%;
+  padding: 0;
+  caret-color: transparent;
+  transition: color 0.2s ease;
+}
+
+.input_wrapper {
+  color: white;
+  position: relative;
+  width: 100%;
+}
+
+#output {
+  white-space: pre-wrap;
+}
+
+.system-line {
+  color: #9e9e9e;
+  letter-spacing: 0.3px;
+}
+
+.error-line {
+  color: #9e9e9e;
+  opacity: 0.85;
+}
+
+.prompt-text {
+  color: white;
+}
+
+.output-line {
+  color: aqua;
+}
+
+/* Typing state */
+.typing-valid {
+  color: #55c33c;
+}
+
+.typing-invalid {
+  color: #ff4c4c;
+}
+
+.ghost_text {
+  position: absolute;
+  top: 0;
+  left: 0;
+  color: #555;
+  pointer-events: none;
+  white-space: pre;
+  font-family: inherit;
+  font-size: inherit;
+  line-height: inherit;
+}
+
+.cursor {
+  position: absolute;
+  top: 0.2em;
+  width: 8px;
+  height: 1em;
+  background: currentColor;
+  animation: blink 1s step-end infinite;
+}
+
+@keyframes blink {
+  50% {
+    opacity: 0;
+  }
+}
