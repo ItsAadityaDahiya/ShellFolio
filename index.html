@@ -2,15 +2,17 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>ShellFolio</title>
-    <link rel="stylesheet" href="index.css" />
+    <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+    <link rel="stylesheet" href="./assets/index.css" />
   </head>
   <body>
     <div id="terminal_window">
       <div class="title_bar">
         <div class="title_left">
-          <img src="cmd.svg" class="icon" />
-          <span class="title_text">shell</span>
+          <img src="./assets/images/cmd.svg" class="icon" />
+          <span class="title_text">shellfolio</span>
         </div>
 
         <div class="title_right">
@@ -24,16 +26,21 @@
         <div id="output"></div>
 
         <div class="input_line">
-          <span class="prompt">aaditya@portfolio:~$</span>
+          <span class="prompt" id="prompt_display"></span>
           <div class="input_wrapper">
             <span class="ghost_text"></span>
-            <input type="text" id="command_input" />
+            <input
+              type="text"
+              id="command_input"
+              autocomplete="off"
+              spellcheck="false"
+            />
             <span class="cursor"></span>
           </div>
         </div>
       </div>
     </div>
 
-    <script src="index.js"></script>
+    <script src="./assets/index.js"></script>
   </body>
 </html>

@@ -1,11 +1,18 @@
+@font-face {
+  font-family: "CaskaydiaMono";
+  src: url("./fonts/CaskaydiaMonoPropo-SemiLight.ttf") format("truetype");
+  font-weight: 300;
+  font-style: normal;
+}
+
 body {
-  background: #1b1b1b;
+  background: url("./images/bg.jpg") center center / cover no-repeat;
   margin: 0;
   height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-family: Consolas, "Fira Code", monospace;
+  font-family: "CaskaydiaMono", Consolas, "Fira Code", monospace;
 }
 
 #terminal_window {
@@ -14,8 +21,10 @@ body {
   border: 2px solid #3a3a3a;
   border-radius: 12px;
   overflow: hidden;
-  background: #0c0c0c;
   box-shadow: 0 10px 35px rgba(0, 0, 0, 0.8);
+  background: rgba(12, 12, 12, 0.75);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
 }
 
 .title_bar {
@@ -77,6 +86,7 @@ body {
   height: calc(100% - 32px);
   box-sizing: border-box;
   overflow-y: auto;
+  scroll-behavior: smooth;
 }
 
 #terminal::-webkit-scrollbar {
@@ -103,7 +113,7 @@ body {
 
 .prompt {
   margin-right: 8px;
-  color: white;
+  color: #faa307;
 }
 
 input {
@@ -141,7 +151,7 @@ input {
 }
 
 .prompt-text {
-  color: white;
+  color: #faa307;
 }
 
 .output-line {
@@ -181,5 +191,17 @@ input {
 @keyframes blink {
   50% {
     opacity: 0;
+  }
+}
+
+/* Responsive for Mobile */
+@media (max-width: 768px) {
+  #terminal_window {
+    width: 95%;
+    height: 85vh;
+  }
+
+  #terminal {
+    font-size: 14px;
   }
 }

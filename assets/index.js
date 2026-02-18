@@ -4,27 +4,37 @@ const cursor = document.querySelector(".cursor");
 const wrapper = document.querySelector(".input_wrapper");
 const ghost = document.querySelector(".ghost_text");
 
+// Hidden span for measuring text width
+const measureSpan = document.createElement("span");
+measureSpan.style.visibility = "hidden";
+measureSpan.style.position = "absolute";
+measureSpan.style.whiteSpace = "pre";
+measureSpan.style.top = "-9999px";
+measureSpan.style.left = "-9999px";
+document.body.appendChild(measureSpan);
+
+const DEFAULT_USERNAME = "aaditya";
+const PROMPT = `${DEFAULT_USERNAME}@shellfolio:~$ `;
+document.getElementById("prompt_display").textContent = PROMPT;
+
+function delayedOutput(text, className = "output-line", delay = 100) {
+  setTimeout(() => {
+    printOutput(text, className);
+  }, delay);
+}
+
 // Real Caret following Cursor
 function updateCursorPosition() {
   const textBeforeCaret = input.value.substring(0, input.selectionStart);
 
-  const tempSpan = document.createElement("span");
-  tempSpan.style.visibility = "hidden";
-  tempSpan.style.position = "absolute";
-  tempSpan.style.whiteSpace = "pre";
-  tempSpan.style.font = window.getComputedStyle(input).font;
+  measureSpan.style.font = window.getComputedStyle(input).font;
+  measureSpan.textContent = textBeforeCaret || " ";
 
-  tempSpan.textContent = textBeforeCaret || " ";
+  const textWidth = measureSpan.getBoundingClientRect().width;
 
-  document.body.appendChild(tempSpan);
-
-  const textWidth = tempSpan.getBoundingClientRect().width;
-
-  // Optional Upgrade: Dynamic Cursor Width (match one character width)
-  tempSpan.textContent = "M";
-  const charWidth = tempSpan.getBoundingClientRect().width;
-
-  document.body.removeChild(tempSpan);
+  // Dynamic cursor width (match one character width)
+  measureSpan.textContent = "M";
+  const charWidth = measureSpan.getBoundingClientRect().width;
 
   cursor.style.left = textWidth + "px";
   cursor.style.width = charWidth + "px";
@@ -56,42 +66,8 @@ let commandHistory = [];
 let historyIndex = -1;
 let tempInput = "";
 
-// Tab Auto-Complete
+// Tab Counter
 let tabPressCount = 0;
-
-input.addEventListener("keydown", function (e) {
-  if (e.key === "Tab") {
-    e.preventDefault();
-
-    const value = input.value.toLowerCase().trim();
-    const commandList = Object.keys(commands);
-
-    if (value === "") return;
-
-    const matches = commandList.filter((cmd) => cmd.startsWith(value));
-
-    if (matches.length === 1) {
-      // Single Match > Auto Complete
-      input.value += ghost.textContent;
-      ghost.textContent = "";
-      updateTypingState();
-      updateCursorPosition();
-      tabPressCount = 0;
-    } else if (matches.length > 1) {
-      tabPressCount++;
-
-      if (tabPressCount === 2) {
-        printOutput("");
-        matches.forEach((match) => {
-          printOutput(match);
-        });
-        printOutput("");
-        scrollToBottom();
-        tabPressCount = 0;
-      }
-    }
-  }
-});
 
 // Ghost Text for Auto-Complete
 function updateGhostText() {
@@ -115,76 +91,131 @@ function updateGhostText() {
 
 // Event Listeners
 input.addEventListener("keydown", function (e) {
-  // Enter
-  if (e.key === "Enter") {
+  const value = input.value.toLowerCase().trim();
+
+  // Tab Auto-Complete
+  if (e.key === "Tab") {
+    e.preventDefault();
+
+    if (!value) return;
+
+    const matches = Object.keys(commands).filter((cmd) =>
+      cmd.startsWith(value),
+    );
+
+    if (matches.length === 1) {
+      input.value += ghost.textContent;
+      ghost.textContent = "";
+      updateTypingState();
+      updateCursorPosition();
+      tabPressCount = 0;
+    } else if (matches.length > 1) {
+      tabPressCount++;
+      if (tabPressCount === 2) {
+        printOutput("");
+        matches.forEach((cmd) => printOutput(cmd, "output-line"));
+        printOutput("");
+        scrollToBottom();
+        tabPressCount = 0;
+      }
+    }
+  }
+
+  // Enter Key - Execute Command
+  else if (e.key === "Enter") {
     e.preventDefault();
 
     const command = input.value.trim();
     const lowerCommand = command.toLowerCase();
 
-    if (command !== "") {
-      // Normalize (so HELP and help are treated the same)
-      const normalizedCommand = command.toLowerCase();
-
-      const alreadyExists = commandHistory.some(
-        (cmd) => cmd.toLowerCase() === normalizedCommand,
-      );
-
-      if (!alreadyExists) {
-        commandHistory.push(command);
-      }
-
-      historyIndex = commandHistory.length;
+    if (
+      command &&
+      !commandHistory.some((c) => c.toLowerCase() === lowerCommand)
+    ) {
+      commandHistory.push(command);
     }
 
-    const isValid = commands.hasOwnProperty(lowerCommand);
+    historyIndex = commandHistory.length;
 
-    printCommand(command, isValid);
+    printCommand(command, commands.hasOwnProperty(lowerCommand));
     runCommand(command);
 
     input.value = "";
+    tempInput = "";
     ghost.textContent = "";
-    updateTypingState(); // Reset Color
+    updateTypingState();
     updateCursorPosition();
   }
 
-  // Arrow Up
-  if (e.key === "ArrowUp") {
+  // Arrow Up - Command History Navigation
+  else if (e.key === "ArrowUp") {
     e.preventDefault();
+
+    if (commandHistory.length === 0) return;
 
     if (historyIndex === commandHistory.length) {
-      tempInput = input.value; // save current typed text
+      tempInput = input.value;
     }
 
-    if (historyIndex > 0) {
+    let found = false;
+
+    while (historyIndex > 0) {
       historyIndex--;
-      input.value = commandHistory[historyIndex];
+      const candidate = commandHistory[historyIndex];
+      const baseCommand = candidate.split(" ")[0].toLowerCase();
+
+      if (commands.hasOwnProperty(baseCommand)) {
+        input.value = candidate;
+        found = true;
+        break;
+      }
+    }
+
+    if (!found) {
+      historyIndex = commandHistory.length;
+      input.value = tempInput;
     }
 
     input.setSelectionRange(input.value.length, input.value.length);
-
     updateTypingState();
     updateGhostText();
     updateCursorPosition();
   }
 
-  // Arrow Down
-  if (e.key === "ArrowDown") {
+  // Arrow Down - Command History Navigation
+  else if (e.key === "ArrowDown") {
     e.preventDefault();
 
-    if (historyIndex < commandHistory.length - 1) {
+    if (commandHistory.length === 0) return;
+
+    while (historyIndex < commandHistory.length - 1) {
       historyIndex++;
-      input.value = commandHistory[historyIndex];
-    } else {
-      historyIndex = commandHistory.length;
-      input.value = tempInput; // restore original typed text
+      const candidate = commandHistory[historyIndex];
+      const baseCommand = candidate.toLowerCase().split(" ")[0];
+
+      if (commands.hasOwnProperty(baseCommand)) {
+        input.value = candidate;
+        input.setSelectionRange(input.value.length, input.value.length);
+        updateTypingState();
+        updateGhostText();
+        updateCursorPosition();
+        return;
+      }
     }
 
-    input.setSelectionRange(input.value.length, input.value.length);
+    // If no valid command found ahead
+    historyIndex = commandHistory.length;
+    input.value = tempInput;
 
+    input.setSelectionRange(input.value.length, input.value.length);
     updateTypingState();
     updateGhostText();
     updateCursorPosition();
+  }
+
+  // Reset Tab Counter on other keys
+  if (e.key !== "Tab") {
+    tabPressCount = 0;
   }
 });
 
@@ -199,13 +230,14 @@ input.addEventListener("input", () => {
 input.addEventListener("click", updateCursorPosition);
 input.addEventListener("keyup", updateCursorPosition);
 
-// Auto Focus anywhere Click
+// Auto Focus anywhere click
 document.getElementById("terminal_window").addEventListener("click", () => {
   input.focus();
 });
 
 // Initialize Cursor Position
 updateCursorPosition();
+input.focus();
 
 // Print Functions
 function printCommand(cmd, isValid) {
@@ -214,7 +246,7 @@ function printCommand(cmd, isValid) {
 
   const promptSpan = document.createElement("span");
   promptSpan.classList.add("prompt-text");
-  promptSpan.textContent = "aaditya@portfolio:~$ ";
+  promptSpan.textContent = PROMPT;
 
   const commandSpan = document.createElement("span");
   commandSpan.textContent = cmd;
@@ -307,7 +339,7 @@ function runCommand(cmd) {
   if (commands.hasOwnProperty(command)) {
     commands[command]();
   } else {
-    printOutput(`command not found: ${cmd}`, "error-line");
+    printOutput(`Command not found: ${cmd}`, "error-line");
 
     const suggestion = getClosestCommand(command);
 
@@ -315,7 +347,7 @@ function runCommand(cmd) {
       printOutput(`Did you mean '${suggestion}'?`, "error-line");
     }
 
-    printOutput(`type 'help' to see available commands`, "error-line");
+    printOutput(`Type 'help' to see available commands`, "error-line");
   }
 }
 
@@ -325,43 +357,48 @@ const commands = {
 
   about: () => {
     printOutput("Hi, I'm Aaditya Dahiya");
-    printOutput("CSE Undergrad | Developer | Designer");
-    printOutput("Passionate about AI, UI/UX and building impactful products.");
+    printOutput("CSE Undergrad | Full Stack Developer | Graphic Designer");
+    printOutput(
+      "A developer-designer crafting intelligent and visually compelling solutions.",
+    );
   },
 
   resume: () => {
-    printOutput("Resume Options:");
+    printOutput("Resume options:");
     printOutput("view resume");
     printOutput("download resume");
   },
 
   "view resume": () => {
-    window.open("resume.pdf", "_blank");
+    window.open(
+      "https://drive.google.com/file/d/1eooCIVj3EZ_a356dBheD7GHYj9nsShSq/preview",
+      "_blank",
+    );
   },
 
   "download resume": () => {
-    const link = document.createElement("a");
-    link.href = "resume.pdf";
-    link.download = "Resume.pdf";
-    link.click();
+    window.open(
+      "https://drive.google.com/uc?export=download&id=1eooCIVj3EZ_a356dBheD7GHYj9nsShSq",
+      "_blank",
+    );
   },
 
   skills: () => {
     printOutput("Technical Skills:");
-    printOutput("Languages: C++, Python, JavaScript");
+    printOutput("Languages: C, C++, Python, Java, Dart, Flutter, JS");
     printOutput("Frameworks: React, Node.js");
-    printOutput("AI/ML: TensorFlow, Scikit-learn");
+    printOutput("Design: Figma, Blender, Canva, AutoCAD");
+    printOutput("Others: Git, SQL");
   },
 
   projects: () => {
     printOutput("Projects:");
     printOutput("1. Penny AI - Smart Finance Tracker");
     printOutput("2. ShellFolio");
-    printOutput("3. AR Navigation Concept App");
+    printOutput("3. Tempora");
   },
 
   contributions: () => {
-    printOutput("Opening GitHub Profile...");
     commands.github();
   },
 
@@ -372,14 +409,17 @@ const commands = {
   },
 
   linktree: () => {
+    delayedOutput("Opening Linktree...", "output-line", 120);
     window.open("https://linktr.ee/aadityadahiya", "_blank");
   },
 
   github: () => {
+    delayedOutput("Opening GitHub Profile...", "output-line", 120);
     window.open("https://github.com/ItsAadityaDahiya", "_blank");
   },
 
   linkedin: () => {
+    delayedOutput("Opening LinkedIn Profile...", "output-line", 120);
     window.open("https://www.linkedin.com/in/iamaadityadahiya", "_blank");
   },
 
@@ -390,10 +430,10 @@ const commands = {
   hidden: () => {
     printOutput("Hidden commands:");
     printOutput("");
+    printOutput("whoami");
+    printOutput("ascii");
     printOutput("history");
     printOutput("history -c");
-    printOutput("myself");
-    printOutput("ascii");
   },
 
   history: () => {
@@ -419,7 +459,7 @@ const commands = {
     printOutput("Command history cleared.");
   },
 
-  myself: () => {
+  whoami: () => {
     printOutput("Aaditya Dahiya");
   },
 
@@ -439,7 +479,6 @@ const commands = {
        ██████╔╝ ██║  ██║ ██║  ██║ ██║    ██║    ██║  ██║
        ╚═════╝  ╚═╝  ╚═╝ ╚═╝  ╚═╝ ╚═╝    ╚═╝    ╚═╝  ╚═╝
     `,
-      2,
     );
   },
 };
@@ -447,7 +486,7 @@ const commands = {
 // Help Text
 const helpCommands = [
   ["help", "Show available commands"],
-  ["about", "Display information about Aaditya"],
+  ["about", "Display personal information"],
   ["resume", "Resume options"],
   ["skills", "List of skills"],
   ["projects", "Show projects preview"],
@@ -461,7 +500,7 @@ const helpCommands = [
 ];
 
 function printHelp() {
-  printOutput("Available commands:\n");
+  printOutput("Available commands:");
   printOutput("");
 
   const longestCommand = Math.max(...helpCommands.map((cmd) => cmd[0].length));
@@ -473,6 +512,6 @@ function printHelp() {
 }
 
 // Boot Message
-printOutput("Microsoft Windows [Version 10.0.22621.1]", "system-line");
-printOutput("(c) Microsoft Corporation. All rights reserved.\n", "system-line");
-printOutput("Type 'help' to view available commands.\n", "system-line");
+printOutput("ShellFolio [Version 1.0.0]", "system-line");
+printOutput("(c) Aaditya Dahiya. All rights reserved.", "system-line");
+printOutput("Type 'help' to view available commands.", "system-line");

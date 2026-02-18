@@ -18,7 +18,7 @@ Unlike static portfolios, this project focuses on interaction design and enginee
 
 ## Live Demo
 
-https://yourname.github.io/shellfolio
+https://itsaadityadahiya.github.io/ShellFolio
 
 ## Key Features
 
@@ -34,7 +34,7 @@ https://yourname.github.io/shellfolio
 - Unique command storage (no duplicates)
 - Restore partially typed commands during navigation
 - history command
-- clear_history command
+- history -c command
 
 ### 3. Real Terminal Behavior
 
@@ -58,7 +58,7 @@ https://yourname.github.io/shellfolio
 | Levenshtein Algo   | Intelligent Error Suggestions |
 | DOM Manipulation   | Dynamic Terminal Rendering    |
 
-No frameworks. No libraries. Pure frontend engineering.
+Built entirely with Vanilla JavaScript to demonstrate deep understanding of core frontend fundamentals without framework abstraction.
 
 ## Architecture Overview
 
@@ -85,27 +85,28 @@ This keeps the system modular and scalable.
 | `help`          | Show available commands         |
 | `about`         | Display personal information    |
 | `resume`        | Resume options (view/download)  |
+| `skills`        | List of skills                  |
 | `projects`      | Show project previews           |
+| `contributions` | Open GitHub profile             |
 | `contact`       | Display contact details         |
+| `linktree`      | Open Linktree                   |
 | `github`        | Open GitHub profile             |
 | `linkedin`      | Open LinkedIn profile           |
-| `history`       | Show command history            |
-| `clear`         | Clear terminal screen           |
-| `clear_history` | Clear stored command history    |
+| `clear`         | Clear terminal                  |
 | `hidden`        | Show hidden/easter egg commands |
 
 ## Example Interaction
 
 | Input     | Output                          |
 | --------- | ------------------------------- |
-| `helpp`   | `Did you mean "help"?`          |
+| `helpp`   | `Did you mean 'help'?`          |
 | `history` | Shows list of executed commands |
 
 ## Preview
 
 Add a screenshot here:
 
-![Terminal Preview](./preview.png)
+![ShellFolio Preview](./assets/images/preview.png)
 
 ## Why This Project Matters
 
@@ -121,11 +122,10 @@ It reflects both technical depth and creative product thinking.
 
 ## Future Improvements
 
-- LocalStorage persistence
+- Local Storage persistence
 - Command argument parsing
 - Modular command plugin system
 - Theme switching
-- Mobile optimization
 
 ## Contact
 
