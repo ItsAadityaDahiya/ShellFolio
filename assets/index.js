@@ -4,7 +4,7 @@ const cursor = document.querySelector(".cursor");
 const wrapper = document.querySelector(".input_wrapper");
 const ghost = document.querySelector(".ghost_text");
 
-// Hidden span for measuring text width
+// Hidden Span for measuring text width
 const measureSpan = document.createElement("span");
 measureSpan.style.visibility = "hidden";
 measureSpan.style.position = "absolute";
@@ -28,11 +28,11 @@ function updateCursorPosition() {
   const textBeforeCaret = input.value.substring(0, input.selectionStart);
 
   measureSpan.style.font = window.getComputedStyle(input).font;
-  measureSpan.textContent = textBeforeCaret || " ";
+  measureSpan.textContent = textBeforeCaret || "";
 
   const textWidth = measureSpan.getBoundingClientRect().width;
 
-  // Dynamic cursor width (match one character width)
+  // Dynamic Cursor Width (match one character width)
   measureSpan.textContent = "M";
   const charWidth = measureSpan.getBoundingClientRect().width;
 
@@ -52,7 +52,15 @@ function updateTypingState() {
 
   const commandList = Object.keys(commands);
 
-  const hasMatch = commandList.some((cmd) => cmd.startsWith(value));
+  const base = value.split(" ")[0];
+
+  let hasMatch = commandList.some((cmd) => cmd.startsWith(base));
+
+  if (!hasMatch && currentContext && contextOptions[currentContext]) {
+    hasMatch = contextOptions[currentContext].some((opt) =>
+      opt.startsWith(base),
+    );
+  }
 
   if (hasMatch) {
     wrapper.classList.add("typing-valid");
@@ -65,6 +73,7 @@ function updateTypingState() {
 let commandHistory = [];
 let historyIndex = -1;
 let tempInput = "";
+let currentContext = null;
 
 // Tab Counter
 let tabPressCount = 0;
@@ -121,7 +130,7 @@ input.addEventListener("keydown", function (e) {
     }
   }
 
-  // Enter Key - Execute Command
+  // Enter Key -> Execute Command
   else if (e.key === "Enter") {
     e.preventDefault();
 
@@ -137,7 +146,15 @@ input.addEventListener("keydown", function (e) {
 
     historyIndex = commandHistory.length;
 
-    printCommand(command, commands.hasOwnProperty(lowerCommand));
+    const base = lowerCommand.split(" ")[0];
+
+    let isValid = commands.hasOwnProperty(base);
+
+    if (!isValid && currentContext && contextOptions[currentContext]) {
+      isValid = contextOptions[currentContext].includes(lowerCommand);
+    }
+
+    printCommand(command, isValid);
     runCommand(command);
 
     input.value = "";
@@ -147,7 +164,7 @@ input.addEventListener("keydown", function (e) {
     updateCursorPosition();
   }
 
-  // Arrow Up - Command History Navigation
+  // Arrow Up -> Command History Navigation
   else if (e.key === "ArrowUp") {
     e.preventDefault();
 
@@ -182,7 +199,7 @@ input.addEventListener("keydown", function (e) {
     updateCursorPosition();
   }
 
-  // Arrow Down - Command History Navigation
+  // Arrow Down -> Command History Navigation
   else if (e.key === "ArrowDown") {
     e.preventDefault();
 
@@ -203,7 +220,7 @@ input.addEventListener("keydown", function (e) {
       }
     }
 
-    // If no valid command found ahead
+    // If No Valid Command found ahead
     historyIndex = commandHistory.length;
     input.value = tempInput;
 
@@ -328,32 +345,69 @@ function getClosestCommand(input) {
     }
   });
 
-  // Only suggest if it's reasonably close
   return minDistance <= 2 ? closest : null;
 }
 
 // Command Execution
 function runCommand(cmd) {
-  const command = cmd.toLowerCase();
+  const command = cmd.toLowerCase().trim();
 
-  if (commands.hasOwnProperty(command)) {
-    commands[command]();
-  } else {
-    printOutput(`Command not found: ${cmd}`, "error-line");
-
-    const suggestion = getClosestCommand(command);
-
-    if (suggestion) {
-      printOutput(`Did you mean '${suggestion}'?`, "error-line");
-    }
-
-    printOutput(`Type 'help' to see available commands`, "error-line");
+  if (commands[command]) {
+    commands[command](command);
+    return;
   }
+
+  const base = command.split(" ")[0];
+
+  if (commands[base]) {
+    commands[base](command);
+    return;
+  }
+
+  if (currentContext && commands[currentContext]) {
+    commands[currentContext](currentContext + " " + command);
+    return;
+  }
+
+  printOutput(`Command not found: ${cmd}`, "error-line");
+
+  const suggestion = getClosestCommand(command);
+  if (suggestion) {
+    printOutput(`Did you mean '${suggestion}'?`, "error-line");
+  }
+
+  printOutput(`Type 'help' to see available commands`, "error-line");
 }
 
 // Commands
 const commands = {
   help: () => printHelp(),
+
+  theme: (cmd) => {
+    const args = cmd.split(" ").slice(1).join(" ").trim();
+
+    if (!args) {
+      currentContext = "theme";
+
+      printOutput("Theme:");
+      printOutput("light");
+      printOutput("dark");
+      printOutput("Type 'exit' to leave this mode");
+      return;
+    }
+
+    currentContext = null;
+
+    if (args.includes("light")) {
+      document.body.classList.add("light-mode");
+      printOutput("Switched to Light Mode");
+    } else if (args.includes("dark")) {
+      document.body.classList.remove("light-mode");
+      printOutput("Switched to Dark Mode");
+    } else {
+      printOutput("Invalid theme option");
+    }
+  },
 
   about: () => {
     printOutput("Hi, I'm Aaditya Dahiya");
@@ -393,9 +447,39 @@ const commands = {
 
   projects: () => {
     printOutput("Projects:");
-    printOutput("1. Penny AI - Smart Finance Tracker");
+    printOutput("1. Finova - Personal Finance Assistant");
     printOutput("2. ShellFolio");
     printOutput("3. Tempora");
+    printOutput("Type 'open' to open project");
+  },
+
+  open: (cmd) => {
+    const args = cmd.split(" ").slice(1).join(" ").trim();
+
+    if (!args) {
+      currentContext = "open";
+
+      printOutput("Available projects:");
+      printOutput("finova");
+      printOutput("tempora");
+      printOutput("shellfolio");
+      printOutput("Type 'exit' to leave this mode");
+      return;
+    }
+
+    currentContext = null;
+
+    if (args.includes("finova")) {
+      printOutput("Opening Finova...");
+      window.open("https://your-finova-link.com", "_blank");
+    } else if (args.includes("tempora")) {
+      printOutput("Opening Tempora...");
+      window.open("https://your-tempora-link.com", "_blank");
+    } else if (args.includes("shellfolio")) {
+      printOutput("You're already inside ShellFolio");
+    } else {
+      printOutput("Project not found");
+    }
   },
 
   contributions: () => {
@@ -423,19 +507,6 @@ const commands = {
     window.open("https://www.linkedin.com/in/iamaadityadahiya", "_blank");
   },
 
-  clear: () => {
-    output.innerHTML = "";
-  },
-
-  hidden: () => {
-    printOutput("Hidden commands:");
-    printOutput("");
-    printOutput("whoami");
-    printOutput("ascii");
-    printOutput("history");
-    printOutput("history -c");
-  },
-
   history: () => {
     if (commandHistory.length === 0) {
       printOutput("No commands in history.");
@@ -449,7 +520,7 @@ const commands = {
 
   "history -c": () => {
     if (commandHistory.length === 0) {
-      printOutput("History is already empty.");
+      printOutput("History is already empty.", "error-line");
       return;
     }
 
@@ -459,8 +530,34 @@ const commands = {
     printOutput("Command history cleared.");
   },
 
+  clear: () => {
+    output.innerHTML = "";
+  },
+
+  exit: () => {
+    if (!currentContext) {
+      printOutput("No active mode to exit", "error-line");
+      return;
+    }
+
+    printOutput(`Exited '${currentContext}' mode`);
+    currentContext = null;
+  },
+
+  hidden: () => {
+    printOutput("Hidden commands:");
+    printOutput("");
+    printOutput("sudo");
+    printOutput("whoami");
+    printOutput("ascii");
+  },
+
   whoami: () => {
     printOutput("Aaditya Dahiya");
+  },
+
+  sudo: () => {
+    printOutput("Permission Denied: You are not ROOT", "error-line");
   },
 
   ascii: () => {
@@ -483,9 +580,15 @@ const commands = {
   },
 };
 
+const contextOptions = {
+  theme: ["light", "dark"],
+  open: ["finova", "tempora", "shellfolio"],
+};
+
 // Help Text
 const helpCommands = [
   ["help", "Show available commands"],
+  ["theme", "Switch theme"],
   ["about", "Display personal information"],
   ["resume", "Resume options"],
   ["skills", "List of skills"],
@@ -496,6 +599,8 @@ const helpCommands = [
   ["github", "Open GitHub"],
   ["linkedin", "Open LinkedIn"],
   ["clear", "Clear terminal"],
+  ["history", "Show command history"],
+  ["history -c", "Clear command history"],
   ["hidden", "Show hidden commands"],
 ];
 

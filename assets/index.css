@@ -158,6 +158,10 @@ input {
   color: aqua;
 }
 
+.option-line {
+  color: #ffffff;
+}
+
 /* Typing state */
 .typing-valid {
   color: #55c33c;
@@ -186,6 +190,56 @@ input {
   height: 1em;
   background: currentColor;
   animation: blink 1s step-end infinite;
+}
+
+.light-mode {
+  background: #e6e9ef !important;
+}
+
+.light-mode .title_bar {
+  background: #1f1f1f;
+  color: #d6d6d6;
+}
+
+.light-mode #terminal_window {
+  background: rgba(255, 255, 255, 0.85);
+  color: #111;
+  border: 2px solid #ccc;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+  backdrop-filter: blur(4px);
+}
+
+.light-mode .prompt,
+.light-mode .prompt-text {
+  color: #ff8800;
+}
+
+.light-mode .cursor {
+  background: black;
+}
+
+.light-mode .output-line {
+  color: #0077cc;
+}
+
+.light-mode .system-line {
+  color: #666;
+}
+
+.light-mode .error-line {
+  color: #cc3333;
+}
+
+.light-mode .typing-valid {
+  color: #2e7d32; /* dark green */
+}
+
+.light-mode .typing-invalid {
+  color: #d32f2f; /* red */
+}
+
+.light-mode .ghost_text {
+  color: #aaa;
 }
 
 @keyframes blink {

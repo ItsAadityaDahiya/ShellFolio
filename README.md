@@ -83,6 +83,7 @@ This keeps the system modular and scalable.
 | Command         | Description                     |
 | --------------- | ------------------------------- |
 | `help`          | Show available commands         |
+| `theme`         | Switch theme (light/dark)       |
 | `about`         | Display personal information    |
 | `resume`        | Resume options (view/download)  |
 | `skills`        | List of skills                  |
@@ -93,6 +94,8 @@ This keeps the system modular and scalable.
 | `github`        | Open GitHub profile             |
 | `linkedin`      | Open LinkedIn profile           |
 | `clear`         | Clear terminal                  |
+| `history`       | Show command history            |
+| `history -c`    | Clear command history           |
 | `hidden`        | Show hidden/easter egg commands |
 
 ## Example Interaction
