@@ -26,15 +26,17 @@ https://itsaadityadahiya.github.io/ShellFolio
 
 - Live typing validation (valid/invalid states)
 - Tab auto-completion with ghost text
-- Smart “Did you mean?” suggestions using Levenshtein Distance
+- Smart "Did you mean?" suggestions using Levenshtein Distance
+- Multi-word command support (e.g. `view resume`, `theme light`, `project finova`)
+- Clickable command options that also work as typed commands
 
 ### 2. Advanced History System
 
 - Arrow ↑ / ↓ navigation
-- Unique command storage (no duplicates)
+- Unique command storage
 - Restore partially typed commands during navigation
-- history command
-- history -c command
+- `history` command
+- `history -c` command
 
 ### 3. Real Terminal Behavior
 
@@ -42,21 +44,27 @@ https://itsaadityadahiya.github.io/ShellFolio
 - Scroll management
 - Command execution feedback
 - Structured help menu
+- Input field stays focused at all times, including after returning from an external tab
 
-### 4. Hidden Commands
+### 4. Project Explorer
 
-- Easter egg commands
+- `projects` lists all projects with clickable previews
+- `project <name>` shows full details: description, tech stack, GitHub link, and live demo
+
+### 5. Hidden Commands
+
+- Easter egg commands listed via `hidden`
 - Simulated system responses
 
 ## Tech Stack
 
-| Technology         | Purpose                       |
-| ------------------ | ----------------------------- |
-| HTML5              | Structure                     |
-| CSS3               | Custom UI Styling             |
-| Vanilla JavaScript | Core Logic & State Management |
-| Levenshtein Algo   | Intelligent Error Suggestions |
-| DOM Manipulation   | Dynamic Terminal Rendering    |
+| Technology                     | Purpose                       |
+| ------------------------------ | ----------------------------- |
+| HTML5                          | Structure                     |
+| CSS3                           | Custom UI Styling             |
+| Vanilla JavaScript             | Core Logic & State Management |
+| Levenshtein Distance Algorithm | Intelligent Error Suggestions |
+| DOM Manipulation               | Dynamic Terminal Rendering    |
 
 Built entirely with Vanilla JavaScript to demonstrate deep understanding of core frontend fundamentals without framework abstraction.
 
@@ -76,38 +84,43 @@ The project is structured around:
 - Error Suggestion Engine
   Edit distance algorithm for intelligent recovery
 
+- Clickable Output System
+  `printClickable` for commands, `printLink` for external URLs — distinct handlers to prevent URL strings being run as terminal commands
+
 This keeps the system modular and scalable.
 
 ## Available Commands
 
-| Command         | Description                     |
-| --------------- | ------------------------------- |
-| `help`          | Show available commands         |
-| `theme`         | Switch theme (light/dark)       |
-| `about`         | Display personal information    |
-| `resume`        | Resume options (view/download)  |
-| `skills`        | List of skills                  |
-| `projects`      | Show project previews           |
-| `contributions` | Open GitHub profile             |
-| `contact`       | Display contact details         |
-| `linktree`      | Open Linktree                   |
-| `github`        | Open GitHub profile             |
-| `linkedin`      | Open LinkedIn profile           |
-| `clear`         | Clear terminal                  |
-| `history`       | Show command history            |
-| `history -c`    | Clear command history           |
-| `hidden`        | Show hidden/easter egg commands |
+| Command           | Description                         |
+| ----------------- | ----------------------------------- |
+| `help`            | Show available commands             |
+| `theme`           | Switch theme (light/dark)           |
+| `about`           | Display personal information        |
+| `resume`          | Resume options (view/download)      |
+| `view resume`     | Open resume in browser              |
+| `download resume` | Download resume                     |
+| `skills`          | List of skills                      |
+| `projects`        | Show project previews               |
+| `project <name>`  | Full details for a specific project |
+| `contact`         | Display contact details             |
+| `github`          | Open GitHub profile                 |
+| `linkedin`        | Open LinkedIn profile               |
+| `linktree`        | Open Linktree                       |
+| `history`         | Show command history                |
+| `history -c`      | Clear command history               |
+| `clear`           | Clear terminal                      |
+| `hidden`          | Show hidden/easter egg commands     |
 
 ## Example Interaction
 
-| Input     | Output                          |
-| --------- | ------------------------------- |
-| `helpp`   | `Did you mean 'help'?`          |
-| `history` | Shows list of executed commands |
+| Input            | Output                                |
+| ---------------- | ------------------------------------- |
+| `helpp`          | `Did you mean 'help'?`                |
+| `history`        | Shows list of executed commands       |
+| `project finova` | Name, description, tech, GitHub link  |
+| `contact`        | Name, email and phone (click to copy) |
 
 ## Preview
-
-Add a screenshot here:
 
 ![ShellFolio Preview](./assets/images/preview.png)
 
@@ -128,7 +141,6 @@ It reflects both technical depth and creative product thinking.
 - Local Storage persistence
 - Command argument parsing
 - Modular command plugin system
-- Theme switching
 
 ## Contact
 
